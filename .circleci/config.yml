@@ -21,9 +21,17 @@ jobs:
 
 workflows:
   version: 2
+  # notes on 'release' workflow - https://circleci.com/docs/2.0/workflows/#executing-workflows-for-a-git-tag
+  # - test job runs for all branches but only tags matching version regex
+  # - release job runs for no branches and only tags matching version regex
   release:
     jobs:
-      - test
+      - test:
+          filters:
+            tags:
+              # tag selector is necessary because release job depends on this job
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+
       - release:
           requires:
             - test
