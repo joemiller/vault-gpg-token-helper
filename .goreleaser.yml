@@ -33,3 +33,13 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+brew:
+  github:
+    owner: joemiller
+    name: homebrew-taps
+  commit_author:
+    name: goreleaser
+    email: goreleaser@joemiller.me
+  folder: Formula
+  homepage: "https://github.com/joemiller/vault-gpg-token-helper"
+  description: "A @hashicorp Vault token helper for GPG (+ yubikey)"
