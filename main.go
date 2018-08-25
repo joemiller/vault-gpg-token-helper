@@ -10,6 +10,12 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
+// var (
+// 	version = "dev"
+// 	commit  = "none"
+// 	date    = "unknown"
+// )
+
 var (
 	tokenPath = "~/.vault_tokens.gpg"
 	gpgKeyID  = ""
@@ -28,12 +34,12 @@ func main() {
 		os.Exit(100)
 	}
 
-	tokenFile, err := homedir.Expand(tokenPath)
+	fullTokenPath, err := homedir.Expand(tokenPath)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(200)
 	}
-	store, err := newGPGTokenStore(tokenFile, gpgKeyID)
+	store, err := newGPGTokenStore(fullTokenPath, gpgKeyID)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(200)
@@ -72,6 +78,8 @@ func main() {
 	}
 }
 
+// TODO: support a config file, even just for vault_gpg_key for now
+// TODO: support alternative tokenpath ?
 func loadConfig() error {
 	vaultAddr = os.Getenv("VAULT_ADDR")
 	if vaultAddr == "" {

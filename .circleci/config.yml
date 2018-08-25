@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/app
+    steps:
+      - checkout
+      - run: sudo apt -qy install gpgv2
+      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run: make deps
+      - run: make test
+
+  release:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/app
+    steps:
+      - checkout
+      - run: curl -sL https://git.io/goreleaser | bash
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - test
+      - release:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
