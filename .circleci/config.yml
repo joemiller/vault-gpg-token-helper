@@ -35,6 +35,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: curl -sL https://git.io/goreleaser | bash
+      # goreleaser install script runs goreleaser automatically after install
 
 workflows:
   version: 2
