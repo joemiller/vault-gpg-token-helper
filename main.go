@@ -1,26 +1,26 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/hashicorp/hcl"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 )
-
-// var (
-// 	version = "dev"
-// 	commit  = "none"
-// 	date    = "unknown"
-// )
 
 var (
-	tokenPath = "~/.vault_tokens.gpg"
-	gpgKeyID  = ""
-	vaultAddr = ""
+	defaultTokenPath  = "~/.vault_tokens.gpg"
+	defaultConfigFile = "~/.vault-gpg-token-helper.toml"
 )
+
+type configuration struct {
+	VaultAddr      string `hcl:"default_vault_addr"`
+	VaultGPGKey    string `hcl:"gpg_key_id"`
+	TokenStorePath string `hcl:"token_db_file"`
+}
 
 type tokenStorer interface {
 	Get(vaultAddr string) string
@@ -29,46 +29,53 @@ type tokenStorer interface {
 }
 
 func main() {
-	if err := loadConfig(); err != nil {
+	if len(os.Args) < 2 {
+		fmt.Println("Error: missing 'command'")
+		exe, _ := os.Executable()
+		fmt.Println("This app is not intended to be run by directly")
+		fmt.Println("Place the following in your '$HOME/.vault' file and run 'vault':")
+		fmt.Printf("token_helper = \"%s\"\n", exe)
+		os.Exit(1)
+	}
+	cmd := os.Args[1]
+
+	cfg, err := loadConfig()
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(100)
 	}
 
-	fullTokenPath, err := homedir.Expand(tokenPath)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(200)
-	}
-	store, err := newGPGTokenStore(fullTokenPath, gpgKeyID)
+	fullTokenPath, err := homedir.Expand(cfg.TokenStorePath)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(200)
 	}
 
-	// missing command, just exit
-	if len(os.Args) < 2 {
-		os.Exit(0)
+	store, err := newGPGTokenStore(fullTokenPath, cfg.VaultGPGKey)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(200)
 	}
 
-	cmd := os.Args[1]
 	switch cmd {
 	case "get":
-		if token := store.Get(vaultAddr); token != "" {
-			fmt.Println(token)
+		if token := store.Get(cfg.VaultAddr); token != "" {
+			fmt.Print(token)
 		}
 	case "store":
-		token, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		stdin, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
-			fmt.Println("ERROR: Failed to read token from STDIN")
+			fmt.Println("ERROR: Failed to read token from STDIN: ", err)
 			os.Exit(1)
 		}
+		token := string(stdin)
 		token = strings.TrimSuffix(token, "\n")
-		if err := store.Store(vaultAddr, token); err != nil {
+		if err := store.Store(cfg.VaultAddr, token); err != nil {
 			fmt.Println(err)
 			os.Exit(2)
 		}
 	case "erase":
-		if err := store.Erase(vaultAddr); err != nil {
+		if err := store.Erase(cfg.VaultAddr); err != nil {
 			fmt.Println(err)
 			os.Exit(3)
 		}
@@ -78,18 +85,55 @@ func main() {
 	}
 }
 
-// TODO: support a config file, even just for vault_gpg_key for now
-// TODO: support alternative tokenpath ?
-func loadConfig() error {
-	vaultAddr = os.Getenv("VAULT_ADDR")
-	if vaultAddr == "" {
-		return errors.New("no VAULT_ADDR environment variable set")
+// loadConfig returns a configuration struct with settings layered in order of preference:
+// - defaults
+// - config file (default: ~/.vault-gpg-token.toml)
+// - environment vars (highest priority)
+func loadConfig() (configuration, error) {
+	// default config
+	cfg := configuration{
+		TokenStorePath: defaultTokenPath,
 	}
 
-	gpgKeyID = os.Getenv("VAULT_GPG_KEY")
-	if gpgKeyID == "" {
-		return errors.New("no VAULT_GPG_KEY environment variable set")
+	// attempt to load settings from config file if available
+	cFile := defaultConfigFile
+	if envFile := os.Getenv("VAULT_GPG_CONFIG"); envFile != "" {
+		cFile = envFile
+	}
+	configFilePath, err := homedir.Expand(cFile)
+	if err != nil {
+		return cfg, err
+	}
+	if _, err := os.Stat(configFilePath); err == nil {
+		contents, err := ioutil.ReadFile(configFilePath)
+		if err != nil {
+			return cfg, err
+		}
+		if err := hcl.Decode(&cfg, string(contents)); err != nil {
+			return cfg, err
+		}
 	}
 
-	return nil
+	// finally layer in environment vars, which have higher preference over defaults and config file
+	if addr := os.Getenv("VAULT_ADDR"); addr != "" {
+		cfg.VaultAddr = addr
+	}
+
+	if key := os.Getenv("VAULT_GPG_KEY_ID"); key != "" {
+		cfg.VaultGPGKey = key
+	}
+
+	if path := os.Getenv("VAULT_GPG_TOKEN_STORE"); path != "" {
+		cfg.TokenStorePath = path
+	}
+
+	// validation
+	if cfg.VaultAddr == "" {
+		return cfg, errors.New("no VAULT_ADDR environment variable set")
+	}
+	if cfg.VaultGPGKey == "" {
+		return cfg, errors.New("no VAULT_GPG_KEY_ID environment variable set, and no 'gpg_key_id' in config file")
+	}
+
+	return cfg, nil
 }
