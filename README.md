@@ -55,6 +55,16 @@ gpg_key_id = "first last (yubikey) <firstlast@dom.tld>"
 
 > Run `gpg --list-keys` for a list of keys.
 
+## Token Storage
+
+Tokens are stored encrypted in `~/.vault_tokens.gpg` by default. This can be
+changed by:
+
+* Setting the `token_db_file` configuration file option
+* Setting the `VAULT_GPG_TOKEN_STORE` environment variable
+
+Environment variables take precedence over configuration file settings.
+
 Usage
 =====
 
