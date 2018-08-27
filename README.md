@@ -21,10 +21,10 @@ to utilize GPG keys stored on a hardware device such as a YubiKey.
 Install
 =======
 
-*Homebrew (macOS):*
-```shell
-brew install joemiller/taps/vault-gpg-token-helper
-```
+* Binary releases are [available](https://github.com/joemiller/vault-gpg-token-helper/releases) for many platforms.
+* Homebrew (macOS): `brew install joemiller/taps/vault-gpg-token-helper`
+
+After installation:
 
 Create a `~/.vault` file with contents:
 
