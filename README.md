@@ -53,8 +53,7 @@ Example:
 gpg_key_id = "first last (yubikey) <firstlast@dom.tld>"
 ```
 
-> Run `gpg --list-keys` for a list of keys. Long and short ID's should be usable
-> in most cases as well.
+> Run `gpg --list-keys` for a list of keys.
 
 Usage
 =====

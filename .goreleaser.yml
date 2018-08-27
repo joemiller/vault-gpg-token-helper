@@ -43,3 +43,9 @@ brew:
   folder: Formula
   homepage: "https://github.com/joemiller/vault-gpg-token-helper"
   description: "A @hashicorp Vault token helper for GPG (+ yubikey)"
+  caveats: |
+    You need to set a path to the token helper in your ~/.vault file.
+    Run the following to create the ~/.vault file:
+
+    echo "token_helper = \"$(brew --prefix joemiller/taps/vault-gpg-token-helper)/bin/vault-gpg-token-helper\"" > ~/.vault
+
