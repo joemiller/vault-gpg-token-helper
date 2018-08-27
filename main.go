@@ -132,7 +132,7 @@ func loadConfig() (configuration, error) {
 		return cfg, errors.New("no VAULT_ADDR environment variable set")
 	}
 	if cfg.VaultGPGKey == "" {
-		return cfg, errors.New("no VAULT_GPG_KEY_ID environment variable set, and no 'gpg_key_id' in config file")
+		return cfg, fmt.Errorf("no VAULT_GPG_KEY_ID environment variable set, and no 'gpg_key_id' in config file: %s", configFilePath)
 	}
 
 	return cfg, nil
