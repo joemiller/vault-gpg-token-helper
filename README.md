@@ -89,6 +89,7 @@ Please open a GitHub issue.
 TODO
 ====
 
+- [ ] use godownloader to create a curl | bash install script
 - [ ] refactor to use the opengpg go lib. Ideally this lib would support
       yubikey, alternatively we could code it to use native code for software
       keys and fallback to shelling out to gpg for stubbed hardware keys. mozilla/sops
