@@ -30,30 +30,30 @@ type tokenStorer interface {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Error: missing 'command'")
+		fmt.Fprintln(os.Stderr, "Error: missing 'command'")
 		exe, _ := os.Executable()
-		fmt.Println("This app is not intended to be run by directly")
-		fmt.Println("Place the following in your '$HOME/.vault' file and run 'vault':")
-		fmt.Printf("token_helper = \"%s\"\n", exe)
+		fmt.Fprintln(os.Stderr, "This app is not intended to be run by directly")
+		fmt.Fprintln(os.Stderr, "Place the following in your '$HOME/.vault' file and run 'vault':")
+		fmt.Fprintf(os.Stderr, "token_helper = \"%s\"\n", exe)
 		os.Exit(1)
 	}
 	cmd := os.Args[1]
 
 	cfg, err := loadConfig()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(100)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(101)
 	}
 
 	fullTokenPath, err := homedir.Expand(cfg.TokenStorePath)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(200)
 	}
 
 	store, err := newGPGTokenStore(fullTokenPath, cfg.VaultGPGKey)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(200)
 	}
 
@@ -65,7 +65,7 @@ func main() {
 	case "store":
 		stdin, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
-			fmt.Println("ERROR: Failed to read token from STDIN: ", err)
+			fmt.Fprintln(os.Stderr, "ERROR: Failed to read token from STDIN: ", err)
 			os.Exit(1)
 		}
 		token := string(stdin)
@@ -80,7 +80,7 @@ func main() {
 			os.Exit(3)
 		}
 	default:
-		fmt.Printf("ERROR: Unknown command '%s'", cmd)
+		fmt.Fprintf(os.Stderr, "ERROR: Unknown command '%s'", cmd)
 		os.Exit(4)
 	}
 }
