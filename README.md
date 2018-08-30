@@ -55,6 +55,25 @@ gpg_key_id = "first last (yubikey) <firstlast@dom.tld>"
 
 > Run `gpg --list-keys` for a list of keys.
 
+## Creating GPG keys
+
+If you don't have a GPG key yet you can create one with:
+
+```shell
+gpg --full-generate-key
+```
+
+Or if using hardware key like a YubiKey with the OpenPGP applet:
+
+```shell
+gpg --card-edit
+
+gpg/card> admin
+gpg/card> generate
+…
+```
+
+
 ## Token Storage
 
 Tokens are stored encrypted in `~/.vault_tokens.gpg` by default. This can be
