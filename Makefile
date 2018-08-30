@@ -18,4 +18,4 @@ todo:
 		--color \
 		-nRo -E 'TODO:.*' .
 
-.PHONY: release-docker todo
+.PHONY: deps test release-snapshot todo
