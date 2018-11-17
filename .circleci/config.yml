@@ -3,25 +3,19 @@ jobs:
   test:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/app
     steps:
-      # setup context
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "Gopkg.lock" }}
-
+            - v2-dependencies-{{ checksum "go.sum" }}
       # run tasks
       - run: sudo apt -qy install gpgv2
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: make deps
       - run: make test
-
       # persist cache for future builds, save current directory to workspace for persisting to next job
       - save_cache:
           paths:
-            - vendor
-          key: v1-dependencies-{{ checksum "Gopkg.lock" }}
+            - /go/pkg/mod
+          key: v2-dependencies-{{ checksum "go.sum" }}
       - persist_to_workspace:
           root: .
           paths:
@@ -30,31 +24,28 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/app
     steps:
       - attach_workspace:
           at: .
-      - run: curl -sL https://git.io/goreleaser | bash
-      # goreleaser install script runs goreleaser automatically after install
+      - run: |
+          curl -s https://api.github.com/repos/pantheon-systems/autotag/releases/latest | \
+            grep browser_download | \
+            grep -i linux | \
+            cut -d '"' -f 4 | \
+            xargs curl -o ~/autotag -L \
+          && chmod 755 ~/autotag
+      - run: ~/autotag
+      - run: curl -sL https://git.io/goreleaser | bash -s -- --parallelism=2
 
 workflows:
   version: 2
-  # notes on 'release' workflow - https://circleci.com/docs/2.0/workflows/#executing-workflows-for-a-git-tag
-  # - test job runs for all branches but only tags matching version regex
-  # - release job runs for no branches and only tags matching version regex
-  release:
+  main:
     jobs:
-      - test:
-          filters:
-            tags:
-              # tag selector is necessary because release job depends on this job
-              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
-
+      - test
       - release:
           requires:
             - test
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+              only:
+                - master

@@ -9,8 +9,8 @@ for GPG with YubiKey.
 Requirements
 ============
 
-* `vault`
-* `gpg` (Tested with 2.2.x, likely compatible with 1.x and 2.1)
+* `vault` cli (macOS: `brew install vault`)
+* `gpg` (Tested with 2.2.x, likely compatible with 1.x and 2.1, macOS: `brew install gnupg`)
 
 A `gpg` binary should be in your `$PATH`. An explicit path can be set with the
 `VAULT_GPG_BIN` environment variable.
@@ -21,22 +21,24 @@ to utilize GPG keys stored on a hardware device such as a YubiKey.
 Install
 =======
 
-* Binary releases are [available](https://github.com/joemiller/vault-gpg-token-helper/releases) for many platforms.
-* Homebrew (macOS): `brew install joemiller/taps/vault-gpg-token-helper`
+1. Install Binary:
 
-After installation:
+  * Binary releases are [available](https://github.com/joemiller/vault-gpg-token-helper/releases) for many platforms.
+  * Homebrew (macOS): `brew install joemiller/taps/vault-gpg-token-helper`
 
-Create a `~/.vault` file with contents:
+2. After installation:
 
-```toml
-token_helper = "/path/to/vault-gpg-token-helper"
-```
+  * Create a `~/.vault` file with contents:
 
-For homebrew installations you can create this file by running:
+    ```toml
+    token_helper = "/path/to/vault-gpg-token-helper"
+    ```
 
-```shell
-echo "token_helper = \"$(brew --prefix joemiller/taps/vault-gpg-token-helper)/bin/vault-gpg-token-helper\"" > ~/.vault
-```
+    > For homebrew installations you can create this file by running:
+
+    ```console
+    echo "token_helper = \"$(brew --prefix joemiller/taps/vault-gpg-token-helper)/bin/vault-gpg-token-helper\"" > ~/.vault
+    ```
 
 Configuration
 =============
@@ -55,7 +57,7 @@ gpg_key_id = "first last (yubikey) <firstlast@dom.tld>"
 
 > Run `gpg --list-keys` for a list of keys.
 
-## Creating GPG keys
+## Creating a GPG keypair
 
 If you don't have a GPG key yet you can create one with:
 
@@ -105,9 +107,24 @@ Support
 
 Please open a GitHub issue.
 
+Release Management
+==================
+
+Releases are cut automatically on a successful master branch build. This project uses
+[autotag](https://github.com/pantheon-systems/autotag) and [goreleaser](https://goreleaser.com/) to automate this process.
+
+Semver (vMajor.Minor.Patch) is used for versioning and releases. By default, autotag will bump the patch version
+on a successful master build, eg: `v1.0.0` -> `v1.0.1`.
+
+To bump the major or minor release instead, include the text `[major]` or `[minor]` in the commit message.
+See the autotag [docs](https://github.com/pantheon-systems/autotag#incrementing-major-and-minor-versions) for more details.
+
+To prevent a new release being built, include `[ci skip]` in the commit message. Only use this for things like documentation updtes.
+
 TODO
 ====
 
+- [ ] support multiple tokens per VAULT_ADDR. Perhps 'VAULT_PROFILE' or 'VAULT_CONTEXT'. May require backwards incompatible change to the storage file format
 - [ ] use godownloader to create a curl | bash install script
 - [ ] refactor to use the opengpg go lib. Ideally this lib would support
       yubikey, alternatively we could code it to use native code for software
