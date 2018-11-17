@@ -7,10 +7,14 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/PuerkitoBio/purell"
 	"github.com/pkg/errors"
 )
 
 const defaultFilePerms = 0600
+
+// purellFlags are used to normalize VAULT_ADDR using the purell lib
+const purellFlags = purell.FlagsSafe | purell.FlagsUsuallySafeGreedy | purell.FlagRemoveDuplicateSlashes
 
 type gpgTokenStore struct {
 	file   string
@@ -49,6 +53,7 @@ func newGPGTokenStore(file, gpgKey string) (gpgTokenStore, error) {
 }
 
 func (s gpgTokenStore) Get(vaultAddr string) string {
+	vaultAddr = normalizeVaultAddr(vaultAddr)
 	if token, exists := s.store[vaultAddr]; exists {
 		return token
 	}
@@ -56,11 +61,13 @@ func (s gpgTokenStore) Get(vaultAddr string) string {
 }
 
 func (s gpgTokenStore) Store(vaultAddr, token string) error {
+	vaultAddr = normalizeVaultAddr(vaultAddr)
 	s.store[vaultAddr] = token
 	return s.encryptFile()
 }
 
 func (s gpgTokenStore) Erase(vaultAddr string) error {
+	vaultAddr = normalizeVaultAddr(vaultAddr)
 	delete(s.store, vaultAddr)
 	return s.encryptFile()
 }
@@ -116,4 +123,12 @@ func (s gpgTokenStore) encryptFile() error {
 	}
 
 	return ioutil.WriteFile(s.file, stdout.Bytes(), defaultFilePerms)
+}
+
+func normalizeVaultAddr(addr string) string {
+	normalized, err := purell.NormalizeURLString(addr, purellFlags)
+	if err != nil {
+		return addr
+	}
+	return normalized
 }
