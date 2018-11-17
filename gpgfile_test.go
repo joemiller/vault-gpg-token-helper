@@ -57,7 +57,7 @@ func setupGpg() error {
 }
 
 func cleanup(t *testing.T) {
-	if os.Getenv("TEST_SKIP_CLEANUP") != "" {
+	if os.Getenv("SKIP_TEST_CLEANUP") != "" {
 		return
 	}
 	if err := os.RemoveAll(gpgTestDir); err != nil {
@@ -90,18 +90,18 @@ func TestGPGTokenStore(t *testing.T) {
 	}
 
 	// read back the entry
-	token := store.Get("https://vault1:8200")
+	token := store.Get("httpS://VaULT1:8200//")
 	if token != "token-foo" {
 		t.Errorf("expected 'token-foo' got '%s'", token)
 	}
 
 	// erase the entry
-	if err := store.Erase("https://vault1:8200"); err != nil {
+	if err := store.Erase("HTTPS://vault1:8200"); err != nil {
 		t.Error("unexpeted error erasing token from the store: ", err)
 	}
 
 	// read back the entry, it should be gone
-	token = store.Get("https://vault1:8200")
+	token = store.Get("https://vault1:8200/")
 	if token != "" {
 		t.Errorf("expected '' got '%s'", token)
 	}
