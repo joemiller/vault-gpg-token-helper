@@ -27,6 +27,9 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "go.sum" }}
       - run: |
           curl -s https://api.github.com/repos/pantheon-systems/autotag/releases/latest | \
             grep browser_download | \
