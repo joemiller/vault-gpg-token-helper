@@ -124,6 +124,9 @@ To prevent a new release being built, include `[ci skip]` in the commit message.
 TODO
 ====
 
+- [ ] move these TODOs to github issues =)
+- [ ] provide a 'list' command to list the contents of the token store (with tokens redacted?) or document in the readme how to list with `gpg -d ...`
+- [ ] normalize URLs to avoid confusing duplicate entries, eg: `https://vault/` and `https://vault` should be the same.
 - [ ] support multiple tokens per VAULT_ADDR. Perhps 'VAULT_PROFILE' or 'VAULT_CONTEXT'. May require backwards incompatible change to the storage file format
 - [ ] use godownloader to create a curl | bash install script
 - [ ] refactor to use the opengpg go lib. Ideally this lib would support
