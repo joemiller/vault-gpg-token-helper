@@ -72,6 +72,7 @@ func (s gpgTokenStore) decryptFile() ([]byte, error) {
 	}
 
 	args := []string{
+		"--batch",
 		"--use-agent",
 		"-d",
 	}
@@ -94,6 +95,7 @@ func (s gpgTokenStore) encryptFile() error {
 	}
 
 	args := []string{
+		"--batch",
 		"--no-default-recipient",
 		"--yes",
 		"--encrypt",
