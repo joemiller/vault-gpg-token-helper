@@ -1,8 +1,5 @@
 APP := vault-gpg-token-helper
 
-deps:
-	@dep ensure
-
 test:
 	@go test -v ./...
 
@@ -18,4 +15,4 @@ todo:
 		--color \
 		-nRo -E 'TODO:.*' .
 
-.PHONY: deps test release-snapshot todo
+.PHONY: test release-snapshot todo

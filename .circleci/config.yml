@@ -3,25 +3,19 @@ jobs:
   test:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/app
     steps:
-      # setup context
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "Gopkg.lock" }}
-
+            - v2-dependencies-{{ checksum "go.sum" }}
       # run tasks
       - run: sudo apt -qy install gpgv2
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: make deps
       - run: make test
-
       # persist cache for future builds, save current directory to workspace for persisting to next job
       - save_cache:
           paths:
-            - vendor
-          key: v1-dependencies-{{ checksum "Gopkg.lock" }}
+            - /go/pkg/mod
+          key: v2-dependencies-{{ checksum "go.sum" }}
       - persist_to_workspace:
           root: .
           paths:
@@ -30,7 +24,6 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/app
     steps:
       - attach_workspace:
           at: .
