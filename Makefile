@@ -3,6 +3,12 @@ APP := vault-gpg-token-helper
 test:
 	@go test -v ./...
 
+build:
+	@go build
+
+build-linux:
+	@GOOS=linux GOARCH=amd64 go build
+
 release-snapshot:
 	@rm -rf ./dist
 	@goreleaser --snapshot
@@ -15,4 +21,4 @@ todo:
 		--color \
 		-nRo -E 'TODO:.*' .
 
-.PHONY: test release-snapshot todo
+.PHONY: build build-linux test release-snapshot todo
