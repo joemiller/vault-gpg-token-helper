@@ -67,8 +67,8 @@ between multiple Vault targets.
 Example, adding a token to the store:
 
 ```console
-$ export VAULT_ADDR="https://vault-a:8200"
-$ vault login
+export VAULT_ADDR="https://vault-a:8200"
+vault login
 ```
 
 Listing contents of the token store can be done with `gpg`, assuming you are using
@@ -100,7 +100,6 @@ gpg/card> generate
 …
 ```
 
-
 Token Storage
 -------------
 
@@ -111,7 +110,6 @@ changed by:
 * Setting the `VAULT_GPG_TOKEN_STORE` environment variable
 
 Environment variables take precedence over configuration file settings.
-
 
 > Vault 0.10.2+ supports a `-no-print` flag to store the token without printing to stdout
 
