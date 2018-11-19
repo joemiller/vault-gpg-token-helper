@@ -7,7 +7,7 @@ A @hashicorp Vault token helper for storing tokens in a GPG encrypted file. Supp
 for GPG with YubiKey.
 
 Requirements
-============
+------------
 
 * `vault` cli (macOS: `brew install vault`)
 * `gpg` (Tested with 2.2.x, likely compatible with 1.x and 2.1, macOS: `brew install gnupg`)
@@ -19,7 +19,7 @@ This program uses the gpg binary instead of Go's opengpg library to make it poss
 to utilize GPG keys stored on a hardware device such as a YubiKey.
 
 Install
-=======
+-------
 
 1. Install Binary:
 
@@ -41,7 +41,7 @@ Install
     ```
 
 Configuration
-=============
+-------------
 
 The default config file is `~/.vault-gpg-token-helper.toml`. This can be changed with the
 `VAULT_GPG_CONFIG` environment variable.
@@ -57,17 +57,42 @@ gpg_key_id = "first last (yubikey) <firstlast@dom.tld>"
 
 > Run `gpg --list-keys` for a list of keys.
 
-## Creating a GPG keypair
+Usage
+-----
+
+The `VAULT_ADDR` environment variable must be set. The storer uses this variable
+as an index for storing and retrieving tokens. This allows for easy switching
+between multiple Vault targets.
+
+Example, adding a token to the store:
+
+```console
+$ export VAULT_ADDR="https://vault-a:8200"
+$ vault login
+```
+
+Listing contents of the token store can be done with `gpg`, assuming you are using
+the default storage path:
+
+```console
+gpg -d ~/.vault_tokens.gpg
+```
+
+> CAREFUL! Tokens will be printed in the clear to your console. In the future we may
+> implement a safer 'list' command.
+
+Creating a GPG keypair
+----------------------
 
 If you don't have a GPG key yet you can create one with:
 
-```shell
+```console
 gpg --full-generate-key
 ```
 
-Or if using hardware key like a YubiKey with the OpenPGP applet:
+Or, if using hardware key like a YubiKey with the OpenPGP applet enabled:
 
-```shell
+```console
 gpg --card-edit
 
 gpg/card> admin
@@ -76,7 +101,8 @@ gpg/card> generate
 ```
 
 
-## Token Storage
+Token Storage
+-------------
 
 Tokens are stored encrypted in `~/.vault_tokens.gpg` by default. This can be
 changed by:
@@ -86,29 +112,16 @@ changed by:
 
 Environment variables take precedence over configuration file settings.
 
-Usage
-=====
-
-The `VAULT_ADDR` environment variable must be set. The storer uses this variable
-as an index for storing and retrieving tokens. This allows for easy switching
-between multiple Vault targets.
-
-Example, adding a token to the store:
-
-```shell
-export VAULT_ADDR="https://vault-a:8200"
-vault login
-```
 
 > Vault 0.10.2+ supports a `-no-print` flag to store the token without printing to stdout
 
 Support
-=======
+-------
 
 Please open a GitHub issue.
 
 Release Management
-==================
+------------------
 
 Releases are cut automatically on a successful master branch build. This project uses
 [autotag](https://github.com/pantheon-systems/autotag) and [goreleaser](https://goreleaser.com/) to automate this process.
@@ -122,6 +135,6 @@ See the autotag [docs](https://github.com/pantheon-systems/autotag#incrementing-
 To prevent a new release being built, include `[ci skip]` in the commit message. Only use this for things like documentation updtes.
 
 TODO
-====
+----
 
 TODOs have moved to github [issues](https://github.com/joemiller/vault-gpg-token-helper/issues)
