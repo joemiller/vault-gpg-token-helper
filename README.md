@@ -3,8 +3,12 @@ vault-gpg-token-helper
 
 [![CircleCI](https://circleci.com/gh/joemiller/vault-gpg-token-helper.svg?style=svg)](https://circleci.com/gh/joemiller/vault-gpg-token-helper)
 
-A @hashicorp Vault token helper for storing tokens in a GPG encrypted file. Support
-for GPG with YubiKey.
+A @hashicorp Vault token helper for storing tokens in a GPG encrypted file. 
+
+Features:
+
+* Supports storing multiple tokens automatically based on the `$VAULT_ADDR` env var.
+* Supports GPG keys stored on YubiKey and other smartcards.
 
 Requirements
 ------------
