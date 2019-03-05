@@ -7,7 +7,7 @@ A @hashicorp Vault token helper for storing tokens in a GPG encrypted file.
 
 Features:
 
-* Supports storing multiple tokens automatically based on the `$VAULT_ADDR` env var.
+* Supports storing multiple tokens based on the `$VAULT_ADDR` env var, simplyfing working with multiple Vault instances.
 * Supports GPG keys stored on YubiKey and other smartcards.
 
 Requirements
