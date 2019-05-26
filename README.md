@@ -3,15 +3,17 @@ vault-gpg-token-helper
 
 [![CircleCI](https://circleci.com/gh/joemiller/vault-gpg-token-helper.svg?style=svg)](https://circleci.com/gh/joemiller/vault-gpg-token-helper)
 
-A @hashicorp Vault token helper for storing tokens in a GPG encrypted file. 
+A @hashicorp Vault [token helper](https://www.vaultproject.io/docs/commands/token-helper.html) for storing tokens in a GPG encrypted file.
 
 Features:
 
-* Supports storing multiple tokens based on the `$VAULT_ADDR` env var, simplyfing working with multiple Vault instances.
+* Supports storing multiple tokens based on the `$VAULT_ADDR` env var.
 * Supports GPG keys stored on YubiKey and other smartcards.
 
-Requirements
-------------
+Install
+-------
+
+### Requirements
 
 * `vault` cli (macOS: `brew install vault`)
 * `gpg` (Tested with 2.2.x, likely compatible with 1.x and 2.1, macOS: `brew install gnupg`)
@@ -22,10 +24,7 @@ A `gpg` binary should be in your `$PATH`. An explicit path can be set with the
 This program uses the gpg binary instead of Go's opengpg library to make it possible
 to utilize GPG keys stored on a hardware device such as a YubiKey.
 
-Install
--------
-
-1. Install Binary:
+1. Install binary:
 
   * Binary releases are [available](https://github.com/joemiller/vault-gpg-token-helper/releases) for many platforms.
   * Homebrew (macOS): `brew install joemiller/taps/vault-gpg-token-helper`
@@ -39,13 +38,12 @@ Install
     ```
 
     > For homebrew installations you can create this file by running:
+    >
+    > ```console
+    > echo "token_helper = \"$(brew --prefix joemiller/taps/vault-gpg-token-helper)/bin/vault-gpg-token-helper\"" > ~/.vault
+    > ```
 
-    ```console
-    echo "token_helper = \"$(brew --prefix joemiller/taps/vault-gpg-token-helper)/bin/vault-gpg-token-helper\"" > ~/.vault
-    ```
-
-Configuration
--------------
+3. Create config file `~/.vault-gpg-token-helper.toml`:
 
 The default config file is `~/.vault-gpg-token-helper.toml`. This can be changed with the
 `VAULT_GPG_CONFIG` environment variable.
