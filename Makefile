@@ -1,17 +1,20 @@
-APP := vault-gpg-token-helper
+deps:
+	@go get
+
+lint:
+	@golangci-lint run -v
 
 test:
 	@go test -v ./...
 
 build:
-	@go build
+	@CGO_ENABLED=0 go build .
 
 build-linux:
-	@GOOS=linux GOARCH=amd64 go build
+	@CGO_ENABLED=0 GOOS=linux go build .
 
-release-snapshot:
-	@rm -rf ./dist
-	@goreleaser --snapshot
+snapshot:
+	@goreleaser --snapshot --rm-dist --debug
 
 todo:
 	@grep \
@@ -21,4 +24,4 @@ todo:
 		--color \
 		-nRo -E 'TODO:.*' .
 
-.PHONY: build build-linux test release-snapshot todo
+.PHONY: build build-linux test snapshot todo

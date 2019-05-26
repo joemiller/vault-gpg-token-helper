@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl"
+	"github.com/joemiller/vault-gpg-token-helper/pkg/gpgfile"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 )
@@ -51,7 +52,7 @@ func main() {
 		os.Exit(200)
 	}
 
-	store, err := newGPGTokenStore(fullTokenPath, cfg.VaultGPGKey)
+	store, err := gpgfile.New(fullTokenPath, cfg.VaultGPGKey)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(200)

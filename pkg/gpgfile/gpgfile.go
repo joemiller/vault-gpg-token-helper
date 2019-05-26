@@ -1,4 +1,4 @@
-package main
+package gpgfile
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ const defaultFilePerms = 0600
 // purellFlags are used to normalize VAULT_ADDR using the purell lib
 const purellFlags = purell.FlagsSafe | purell.FlagsUsuallySafeGreedy | purell.FlagRemoveDuplicateSlashes
 
-type gpgTokenStore struct {
+type tokenStore struct {
 	file   string
 	gpgKey string
 	store  map[string]string
@@ -30,8 +30,8 @@ func gpgBin() string {
 	return bin
 }
 
-func newGPGTokenStore(file, gpgKey string) (gpgTokenStore, error) {
-	store := gpgTokenStore{
+func New(file, gpgKey string) (tokenStore, error) {
+	store := tokenStore{
 		file:   file,
 		gpgKey: gpgKey,
 		store:  make(map[string]string),
@@ -52,7 +52,7 @@ func newGPGTokenStore(file, gpgKey string) (gpgTokenStore, error) {
 	return store, nil
 }
 
-func (s gpgTokenStore) Get(vaultAddr string) string {
+func (s tokenStore) Get(vaultAddr string) string {
 	vaultAddr = normalizeVaultAddr(vaultAddr)
 	if token, exists := s.store[vaultAddr]; exists {
 		return token
@@ -60,19 +60,19 @@ func (s gpgTokenStore) Get(vaultAddr string) string {
 	return ""
 }
 
-func (s gpgTokenStore) Store(vaultAddr, token string) error {
+func (s tokenStore) Store(vaultAddr, token string) error {
 	vaultAddr = normalizeVaultAddr(vaultAddr)
 	s.store[vaultAddr] = token
 	return s.encryptFile()
 }
 
-func (s gpgTokenStore) Erase(vaultAddr string) error {
+func (s tokenStore) Erase(vaultAddr string) error {
 	vaultAddr = normalizeVaultAddr(vaultAddr)
 	delete(s.store, vaultAddr)
 	return s.encryptFile()
 }
 
-func (s gpgTokenStore) decryptFile() ([]byte, error) {
+func (s tokenStore) decryptFile() ([]byte, error) {
 	encrypted, err := ioutil.ReadFile(s.file)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (s gpgTokenStore) decryptFile() ([]byte, error) {
 	return stdout.Bytes(), nil
 }
 
-func (s gpgTokenStore) encryptFile() error {
+func (s tokenStore) encryptFile() error {
 	contents, err := json.Marshal(s.store)
 	if err != nil {
 		return err
