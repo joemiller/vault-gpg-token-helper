@@ -1,6 +1,12 @@
 vault-gpg-token-helper
 ======================
 
+> :warning: This project is retired and will not receive updates. A better option is available
+> with [vault-token-helper](https://github.com/joemiller/vault-gpg-token-helper) which includes
+> support for multiple storage options such as macOS Keychain, Gnome Keyring, Windows Credential Manager.
+> Support for [pass](https://www.passwordstore.org/) is also available if you want to continue
+> encrypting vault tokens with GPG.
+
 [![CircleCI](https://circleci.com/gh/joemiller/vault-gpg-token-helper.svg?style=svg)](https://circleci.com/gh/joemiller/vault-gpg-token-helper)
 
 A @hashicorp Vault [token helper](https://www.vaultproject.io/docs/commands/token-helper.html) for storing tokens in a GPG encrypted file.
